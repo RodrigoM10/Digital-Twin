@@ -1,2 +1,2 @@
 # Digital-Twin
-This repository has twin examples of digital twins, encoded with python.
+This repository has examples of digital twins, encoded with python.
