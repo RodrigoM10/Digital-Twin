@@ -1,31 +1,17 @@
 class ControlledUnity():
 
     def __init__(self, kP = 10.0, kI = 0.0001, kD = 0.01):
-        self.previous = []
-        self.Valve = 0
         self.kP = kP
         self.kI = kI
         self.kD = kD
+
+        self.valve = 0
         self.error_accu = []
     
+        self.previous = []
+
     def PID(self, input_val, Man_auto = False, SetpointMan = 0.0, SetpointAuto = 0.0):
-        """
-        Calculates the output of a PID controller (Proportional, Integral, Derivative).
 
-                Args:
-                    Man_Auto (bool): Manual mode (True) or automatic mode (False).
-                            SetpointMan (bool): Ignored if Man_Auto is True. Manual setpoint mode (True) or automatic mode (False).
-                            SetpointAuto (float): The value of the setpoint in automatic mode.
-
-                 Returns:
-                     None
-
-                 The method calculates the PID controller output using the current value (input_val) and the setpoint (SetpointAuto).
-                 Speed history is stored in self.previous and limited to 100 items.
-                 The controller components P, I, and D are calculated and summed to give the output.
-                 Output is limited to the range 0-100.
-        
-        """
         if Man_auto == False:
             # If the PID is in automatic mode...
 
@@ -55,16 +41,16 @@ class ControlledUnity():
                 aD = 0.0
 
             # Add the components of the Proportional, Integral, and Derivative shares.
-            Output = self.Valve + aP + aI + aD
+            Output = self.valve + aP + aI + aD
 
             # Limited the output of the valve
             if Output < 0:
-                self.Valve = 0
+                self.valve = 0
             elif Output > 100:
-                self.Valve = 100
+                self.valve = 100
             else:
-                self.Valve = Output
+                self.valve = Output
         
         else:
             # if we are in "Manual" mode, the valve is placed in the position we defined at the setpoint.
-            self.Valve = SetpointMan
+            self.valve = SetpointMan

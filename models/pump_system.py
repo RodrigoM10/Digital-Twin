@@ -4,19 +4,27 @@ class Pump:
 
     def __init__(self, MaxRPM):
         self.MaxRPM = MaxRPM
-        self.RPM = 0 #current RPM
-        
+        self.sensor_value = 0 #current Pump Speed RPM RPM
         
         self.previous = [] #necessary for the PID
     
     def update(self, update_interval):
         # Limit to 0 at max speed
-        self.RPM += (-10 + (self.Valve*1.8)) * update_interval #if the valve is close, lose speed.
+        self.sensor_value += (-10 + (self.valve*1.8)) * update_interval #if the valve is close, lose speed.
 
-        if self.RPM < 10:
-            self.RPM = 0
-        elif self.RPM > self.MaxRPM:
-            self.RPM = self.MaxRPM
+        if self.sensor_value < 10:
+            self.sensor_value = 0
+        elif self.sensor_value > self.MaxRPM:
+            self.sensor_value = self.MaxRPM
+
+    def display_status(self, target):
+        print(f"\n" + "="*30)
+        print(f" PUMP SYSTEM STATUS ")
+        print(f"="*30)
+        print(f"Target Speed:  {target:>8.2f} RPM")
+        print(f"Current Speed: {self.sensor_value:>8.2f} RPM")
+        print(f"valve Opening: {self.valve:>8.2f} %")
+        print(f"Status:        {'STABLE' if abs(target - self.sensor_value) < 5 else 'ADJUSTING'}")
 
 
 class ControlledPump(Pump, ControlledUnity):
