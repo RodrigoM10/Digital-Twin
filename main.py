@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from models.pump_system import ControlledPump
 from models.tank_system import ControlledTank
+from models.turbine_system import ControlledTurbine
 
 def select_equipment():
     equipment = {
@@ -24,8 +25,15 @@ def select_equipment():
                 "kP": 12.0,
                 "kI": 0.05, 
                 "kD": 0.2
-            }
-        }
+            }},
+        "3": {
+            "name": "Gas Turbine (RPM)",
+            "class": ControlledTurbine,
+            "params": {
+                "kP": 0.8, 
+                "kI": 0.05, 
+                "kD": 0.1
+            }} 
         }
     print("\n=== Digital Twin Selector ===")
     for key, info in equipment.items():
@@ -47,7 +55,6 @@ def clear_console():
 def run_simulation():
 
     M1, equipament_name = select_equipment()
-
 
     try:
         instruction = float(input(f"Enter the target value for {equipament_name}: "))
