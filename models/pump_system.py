@@ -6,7 +6,7 @@ class Pump:
         self.MaxRPM = MaxRPM
         self.sensor_value = 0 #current Pump Speed RPM RPM
         
-        self.previous = [] #necessary for the PID
+        self.current_step = "STAND BY"
     
     def update(self, update_interval):
         # Limit to 0 at max speed
@@ -16,11 +16,19 @@ class Pump:
             self.sensor_value = 0
         elif self.sensor_value > self.MaxRPM:
             self.sensor_value = self.MaxRPM
+        
+        self.current_step = "CONTROL ACTIVE"
+
+    def emergency_stop_trigger(self):
+        self.valve = 0.0
+        self.current_step = "EMERGENCY TRIP ACTIVATED"
 
     def display_status(self, target):
         print(f"\n" + "="*30)
         print(f" PUMP SYSTEM STATUS ")
         print(f"="*30)
+        print(f"CURRENT STEP: {self.current_step}")
+
         print(f"Target Speed:  {target:>8.2f} RPM")
         print(f"Current Speed: {self.sensor_value:>8.2f} RPM")
         print(f"valve Opening: {self.valve:>8.2f} %")

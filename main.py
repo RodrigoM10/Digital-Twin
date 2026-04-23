@@ -1,6 +1,7 @@
 import time
 import os
 import sys
+import msvcrt
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
@@ -72,12 +73,35 @@ def run_simulation():
         while True:
             M1.PID(input_val=M1.sensor_value, Man_auto=False, SetpointAuto=instruction)
             M1.update(update_interval)
-            clear_console()
-            # 3. Visualization (output)
-            M1.display_status(instruction)
-            print(f"\n-> Waiting {update_interval}s for next update... (Ctrl+C to stop)")
             
+            clear_console()
+        
+            M1.display_status(instruction)
+            print(f"\n-> Waiting {update_interval}s for next update...")
+
+            controls = "[Controls] "
+            if hasattr(M1, 'stop_sequence'):
+                controls += "S: Safe Stop | "
+            elif hasattr(M1, 'emergency_stop_trigger'):
+              controls += "E: Emergency Stop | C: Change Setpoint | Ctrl+C: Exit"
+
+            print(controls)
+
             time.sleep(update_interval)
+          
+            # 4. listen to commands (not blocking)
+            if msvcrt.kbhit():
+                keyboard_press = msvcrt.getch().decode().lower()
+                if keyboard_press == 's' :
+                    if hasattr(M1, 'stop_sequence'):
+                        M1.stop_sequence()                     
+                elif keyboard_press == 'e':
+                    if hasattr(M1, 'emergency_stop_trigger'):
+                        M1.emergency_stop_trigger()
+                elif keyboard_press == 'c':
+                        instruction = float(input("\nNew Target: "))
+
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         print(f"\n\nEquipment control {equipament_name} finished.")
