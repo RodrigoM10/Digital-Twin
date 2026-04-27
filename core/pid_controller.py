@@ -10,9 +10,9 @@ class ControlledUnity():
     
         self.previous = []
 
-    def PID(self, input_val, Man_auto = False, SetpointMan = 0.0, SetpointAuto = 0.0):
+    def PID(self, input_val, automatic_mode, SetpointMan, SetpointAuto = 0.0):
 
-        if Man_auto == False:
+        if automatic_mode == True:
             # If the PID is in automatic mode...
 
             # Store the speed vector in a list of 100 elements.

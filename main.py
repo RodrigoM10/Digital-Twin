@@ -71,7 +71,7 @@ def run_simulation():
 
     try:
         while True:
-            M1.PID(input_val=M1.sensor_value, Man_auto=False, SetpointAuto=instruction)
+            M1.PID(input_val=M1.sensor_value, automatic_mode=M1.auto_mode, SetpointAuto=instruction, SetpointMan=M1.valve)
             M1.update(update_interval)
             
             clear_console()
@@ -81,9 +81,11 @@ def run_simulation():
 
             controls = "[Controls] "
             if hasattr(M1, 'stop_sequence'):
-                controls += "S: Safe Stop | "
+                controls += "S: Safe Stop | E: Emergency Stop | C: Change Setpoint | Ctrl+C: Exit "
             elif hasattr(M1, 'emergency_stop_trigger'):
               controls += "E: Emergency Stop | C: Change Setpoint | Ctrl+C: Exit"
+            else:
+                controls += "C: Change Setpoint | Ctrl+C: Exit"
 
             print(controls)
 
