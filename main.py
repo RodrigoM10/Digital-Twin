@@ -5,6 +5,8 @@ import msvcrt
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
+from core.core_logger import DataLogger
+
 from models.pump_system import ControlledPump
 from models.tank_system import ControlledTank
 from models.turbine_system import ControlledTurbine
@@ -56,6 +58,7 @@ def clear_console():
 def run_simulation():
 
     M1, equipament_name = select_equipment()
+    logger = DataLogger(filename=f"log_{name.replace('','_')}.csv")
 
     try:
         instruction = float(input(f"Enter the target value for {equipament_name}: "))
@@ -74,6 +77,13 @@ def run_simulation():
             M1.PID(input_val=M1.sensor_value, automatic_mode=M1.auto_mode, SetpointAuto=instruction, SetpointMan=M1.valve)
             M1.update(update_interval)
             
+            logger.log_data(
+               equipment_name=equipament_name,
+                target=instruction,
+                current_value=M1.sensor_value,
+                valve_pos=M1.valve 
+            )
+
             clear_console()
         
             M1.display_status(instruction)
