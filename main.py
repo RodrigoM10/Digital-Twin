@@ -6,6 +6,7 @@ import msvcrt
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from core.core_logger import DataLogger
+from core.analyzer import analyze_results
 
 from models.pump_system import ControlledPump
 from models.tank_system import ControlledTank
@@ -58,7 +59,8 @@ def clear_console():
 def run_simulation():
 
     M1, equipament_name = select_equipment()
-    logger = DataLogger(filename=f"log_{name.replace('','_')}.csv")
+    log_name = f"log_{equipament_name.replace('','_')}.csv"
+    logger = DataLogger(filname=log_name)
 
     try:
         instruction = float(input(f"Enter the target value for {equipament_name}: "))
@@ -117,9 +119,11 @@ def run_simulation():
 
     except KeyboardInterrupt:
         print(f"\n\nEquipment control {equipament_name} finished.")
+        analyze_results(logger.filepath)
         retry = input("¿Want to control other equipment? (s/n): ")
         if retry.lower() == 's':
             run_simulation()
+        
 
         # fn to save data on CSV
 

@@ -3,9 +3,17 @@ import os
 from datetime import datetime
 
 class DataLogger:
-    def __init__(self, fillname="telemetry_log.csv"):
-        self.filname = fillname
-        self.file_exists = os.path.isfile(self.filname)
+    def __init__(self, filname="telemetry_log.csv", folder="logs"):
+        self.filname = filname
+        self.folder = folder
+        
+
+        if not os.path.exists(self.folder):
+            os.makedirs(self.folder)
+            print(f"[SYSTEM] Folder '{self.folder}' created")
+
+        self.filepath = os.path.join(self.folder, self.filname)
+        self.file_exists = os.path.isfile(self.filepath)
     
     def log_data(self, equipment_name, target, current_value, valve_pos):
         "Save a row of data in a CSV file"
@@ -15,7 +23,7 @@ class DataLogger:
         headers = ["Timestamp", "Equipment", "Target", "Current_Value", "Valve_Pos"]
     
         try:
-            with open(self.filname, mode='a', newline='') as file:
+            with open(self.filepath, mode='a', newline='') as file:
                 writer = csv.DictWriter(file, fieldnames=headers)
 
                 # if is a new file
