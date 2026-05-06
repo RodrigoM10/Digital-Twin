@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from core.core_logger import DataLogger
 from core.analyzer import analyze_results
+from cloud.bigquery_uploader import BigQueryUploader
 
 from models.pump_system import ControlledPump
 from models.tank_system import ControlledTank
@@ -59,7 +60,8 @@ def clear_console():
 def run_simulation():
 
     M1, equipament_name = select_equipment()
-    log_name = f"log_{equipament_name.replace('','_')}.csv"
+    name_clean = equipament_name.replace(' ','_')
+    log_name = f"log_{name_clean}.csv"
     logger = DataLogger(filname=log_name)
 
     try:
@@ -120,6 +122,13 @@ def run_simulation():
     except KeyboardInterrupt:
         print(f"\n\nEquipment control {equipament_name} finished.")
         analyze_results(logger.filepath)
+
+        try:
+            uploader = BigQueryUploader()
+            uploader.upload_log_to_bq(logger.filepath)
+        except Exception as e:
+            print(f"[ERROR CLOUD] No se pudo subir a BigQuery: {e}")
+
         retry = input("¿Want to control other equipment? (s/n): ")
         if retry.lower() == 's':
             run_simulation()
