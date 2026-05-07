@@ -1,140 +1,33 @@
-import time
 import os
 import sys
-import msvcrt
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from core.core_logger import DataLogger
-from core.analyzer import analyze_results
-from cloud.bigquery_uploader import BigQueryUploader
+try:
+    from dashboard.app import app
+except ImportError as e:
+    print(f"Error al importar el Dashboard: {e}")
+    print("Asegúrate de que la estructura sea: dashboard/app.py")
+    sys.exit(1)
 
-from models.pump_system import ControlledPump
-from models.tank_system import ControlledTank
-from models.turbine_system import ControlledTurbine
+def start_system():
+    """
+    Función principal para lanzar el Gemelo Digital.
+    Ahora la simulación, el control y la carga a la nube
+    se gestionan íntegramente desde la interfaz web.
+    """
+    clear_console = 'cls' if os.name == 'nt' else 'clear'
+    os.system(clear_console)
 
-def select_equipment():
-    equipment = {
-        "1": {"name": "Pump (RPM)", 
-              "class": ControlledPump, 
-              "params": {"MaxRPM": 4000,
-                         "kP":10.0, 
-                         "kI":0.0001, 
-                         "kD":0.01}},
-        "2": {
-            "name": "Water Tank (Level %)",
-            "class": ControlledTank,
-            "params": {
-                "diameter": 2.0, 
-                "height": 10.0, 
-                "kP": 12.0,
-                "kI": 0.05, 
-                "kD": 0.2
-            }},
-        "3": {
-            "name": "Gas Turbine (RPM)",
-            "class": ControlledTurbine,
-            "params": {
-                "kP": 0.8, 
-                "kI": 0.05, 
-                "kD": 0.1
-            }} 
-        }
-    print("\n=== Digital Twin Selector ===")
-    for key, info in equipment.items():
-        print(f"[{key}]-{info['name']}")
+    print("="*50)
+    print("   CENTRO DE CONTROL DIGITAL TWIN - ONLINE")
+    print("="*50)
+    print("\n[INFO] Iniciando servidor local...")
+    print("[INFO] Accede a la interfaz en: http://127.0.0.1:8050/")
+    print("[INFO] Presiona Ctrl+C para apagar el sistema.")
+    print("-"*50)
 
-    selection = input("\nSelect the number of the equipment to control: ")
-
-    if selection in equipment:
-        config = equipment[selection]
-
-        return config['class'](**config['params']), config['name']
-    else:
-        print("Selección no válida. Intente de nuevo.")
-        return select_equipment()
-
-def clear_console():
-   os.system('cls' if os.name == 'nt' else 'clear')
-
-def run_simulation():
-
-    M1, equipament_name = select_equipment()
-    name_clean = equipament_name.replace(' ','_')
-    log_name = f"log_{name_clean}.csv"
-    logger = DataLogger(filname=log_name)
-
-    try:
-        instruction = float(input(f"Enter the target value for {equipament_name}: "))
-    except ValueError:
-        instruction = 1000.0
-    
-    update_interval = 1  
-    
-
-    print("-" * 50)
-    print(f"Iniciando Gemelo Digital: {equipament_name}")
-    print("-" * 50)
-
-    try:
-        while True:
-            M1.PID(input_val=M1.sensor_value, automatic_mode=M1.auto_mode, SetpointAuto=instruction, SetpointMan=M1.valve)
-            M1.update(update_interval)
-            
-            logger.log_data(
-               equipment_name=equipament_name,
-                target=instruction,
-                current_value=M1.sensor_value,
-                valve_pos=M1.valve 
-            )
-
-            clear_console()
-        
-            M1.display_status(instruction)
-            print(f"\n-> Waiting {update_interval}s for next update...")
-
-            controls = "[Controls] "
-            if hasattr(M1, 'stop_sequence'):
-                controls += "S: Safe Stop | E: Emergency Stop | C: Change Setpoint | Ctrl+C: Exit "
-            elif hasattr(M1, 'emergency_stop_trigger'):
-              controls += "E: Emergency Stop | C: Change Setpoint | Ctrl+C: Exit"
-            else:
-                controls += "C: Change Setpoint | Ctrl+C: Exit"
-
-            print(controls)
-
-            time.sleep(update_interval)
-          
-            # 4. listen to commands (not blocking)
-            if msvcrt.kbhit():
-                keyboard_press = msvcrt.getch().decode().lower()
-                if keyboard_press == 's' :
-                    if hasattr(M1, 'stop_sequence'):
-                        M1.stop_sequence()                     
-                elif keyboard_press == 'e':
-                    if hasattr(M1, 'emergency_stop_trigger'):
-                        M1.emergency_stop_trigger()
-                elif keyboard_press == 'c':
-                        instruction = float(input("\nNew Target: "))
-
-            time.sleep(0.1)
-
-    except KeyboardInterrupt:
-        print(f"\n\nEquipment control {equipament_name} finished.")
-        analyze_results(logger.filepath)
-
-        try:
-            uploader = BigQueryUploader()
-            uploader.upload_log_to_bq(logger.filepath)
-        except Exception as e:
-            print(f"[ERROR CLOUD] No se pudo subir a BigQuery: {e}")
-
-        retry = input("¿Want to control other equipment? (s/n): ")
-        if retry.lower() == 's':
-            run_simulation()
-        
-
-        # fn to save data on CSV
+    app.run(debug=True)
 
 if __name__ == "__main__":
-    run_simulation()
+    start_system()
