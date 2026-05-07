@@ -11,11 +11,6 @@ except ImportError as e:
     sys.exit(1)
 
 def start_system():
-    """
-    Función principal para lanzar el Gemelo Digital.
-    Ahora la simulación, el control y la carga a la nube
-    se gestionan íntegramente desde la interfaz web.
-    """
     clear_console = 'cls' if os.name == 'nt' else 'clear'
     os.system(clear_console)
 
