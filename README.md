@@ -44,5 +44,5 @@ El sistema sigue un patrón de diseño donde la Interfaz de Usuario actúa como 
 
 ### 1. Clonar el repositorio
 ```bash
-git clone [https://github.com/TU_USUARIO/Digital-Twin.git](https://github.com/TU_USUARIO/Digital-Twin.git)
+git clone [https://github.com/RodrigoM10/Digital-Twin.git](https://github.com/RodrigoM10/Digital-Twin.git)
 cd Digital-Twin
