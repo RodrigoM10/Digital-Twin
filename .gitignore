@@ -156,6 +156,9 @@ venv.bak/
 
 #GoogleCredentials Json
 gcp_credentials.json
+.venv/
+__pycache__/
+*.csv
 
 # mypy
 .mypy_cache/
