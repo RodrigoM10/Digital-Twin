@@ -3,8 +3,8 @@ import os
 from datetime import datetime
 
 class DataLogger:
-    def __init__(self, filname="telemetry_log.csv", folder="logs"):
-        self.filname = filname
+    def __init__(self, filename="telemetry_log.csv", folder="logs"):
+        self.filename = filename
         self.folder = folder
         
 
@@ -12,7 +12,7 @@ class DataLogger:
             os.makedirs(self.folder)
             print(f"[SYSTEM] Folder '{self.folder}' created")
 
-        self.filepath = os.path.join(self.folder, self.filname)
+        self.filepath = os.path.join(self.folder, self.filename)
         self.file_exists = os.path.isfile(self.filepath)
     
     def log_data(self, equipment_name, target, current_value, valve_pos):
