@@ -47,7 +47,7 @@ El sistema sigue un patrón de diseño donde la Interfaz de Usuario actúa como 
 <<<<<<< HEAD
 git clone [https://github.com/TU_USUARIO/Digital-Twin.git](https://github.com/TU_USUARIO/Digital-Twin.git)
 cd Digital-Twin
-
+```
 ### 2. Crear y activar el entorno virtual
 
 ```bash
@@ -56,12 +56,12 @@ python -m venv .venv
 .venv\Scripts\activate
 # En Mac/Linux:
 source .venv/bin/activate
-
+```
 ### 3. Instalar dependencias
 
 ```bash
 pip install -r requirements.txt
-
+```
 
 ### 4. Configurar Credenciales de Google Cloud
 Para que el historial y la subida de datos funcionen, debes tener un proyecto en Google Cloud con BigQuery activado.
@@ -72,7 +72,4 @@ Renombra el archivo a gcp_credentials.json y colócalo en la raíz de este proye
 ### 5. Ejecutar la Aplicación
 ```bash
 python main.py
-=======
-git clone [https://github.com/RodrigoM10/Digital-Twin.git](https://github.com/RodrigoM10/Digital-Twin.git)
-cd Digital-Twin
->>>>>>> 3ad70ea6349aad86c6c1e0b8327dd4b178831421
+```
