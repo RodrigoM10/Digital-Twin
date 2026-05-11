@@ -162,6 +162,12 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+#google credentials
+gcp_credentials.json
+.venv/
+__pycache__/
+*.csv
+
 # pytype static type analyzer
 .pytype/
 
