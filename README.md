@@ -44,6 +44,7 @@ El sistema sigue un patrón de diseño donde la Interfaz de Usuario actúa como 
 ### 1. Clonar el repositorio
 
 ```bash
+<<<<<<< HEAD
 git clone [https://github.com/TU_USUARIO/Digital-Twin.git](https://github.com/TU_USUARIO/Digital-Twin.git)
 cd Digital-Twin
 
@@ -71,3 +72,7 @@ Renombra el archivo a gcp_credentials.json y colócalo en la raíz de este proye
 ### 5. Ejecutar la Aplicación
 ```bash
 python main.py
+=======
+git clone [https://github.com/RodrigoM10/Digital-Twin.git](https://github.com/RodrigoM10/Digital-Twin.git)
+cd Digital-Twin
+>>>>>>> 3ad70ea6349aad86c6c1e0b8327dd4b178831421
