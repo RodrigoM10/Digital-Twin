@@ -141,19 +141,13 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Tabs([
                 dbc.Tab(
-                    label="Real-Time Monitor",
-                    tab_id="tab-realtime",
-                    label_style={"cursor": "pointer"},
-                    
                     children=[
                         dcc.Graph(id='realtime-graph'),
                         dcc.Interval(id='sim-interval', interval=1000, disabled=True)
-                    ]
+                    ],
+                    label="Real-Time Monitor"
                 ),
                 dbc.Tab(
-                    label="Historical Data (Cloud)",
-                    tab_id="tab-history",
-                    label_style={"cursor": "pointer"},
                     children=[
                         dbc.Row([
                             dbc.Col([
@@ -176,9 +170,11 @@ app.layout = dbc.Container([
                             type="default",
                             children=dcc.Graph(id='historical-graph')
                         )
-                    ]
+                    ],
+                    label="Historical Data (Cloud)"
                 ),
-            ], id="tabs-control", active_tab="tab-realtime")
+                
+            ])
         ], width=9)
     ])
 ], fluid=True)
