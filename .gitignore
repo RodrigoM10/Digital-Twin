@@ -155,7 +155,7 @@ venv.bak/
 /site
 
 #GoogleCredentials Json
-.gcp_credentials.json
+gcp_credentials.json
 
 # mypy
 .mypy_cache/
