@@ -15,7 +15,6 @@ Este proyecto es una implementación completa **End-to-End** de un Gemelo Digita
 ## 📸 Demostración
 <img src="assets/imageExample.jpg" alt="imagen-ejemplo" width="500" height="300" />
 <img src="assets/videoGift.mp4" alt="gift-ejemplo" width="500" height="300" />
-> *Ejemplo: *
 
 ---
 
@@ -43,6 +42,32 @@ El sistema sigue un patrón de diseño donde la Interfaz de Usuario actúa como 
 ## ⚙️ Instalación y Uso
 
 ### 1. Clonar el repositorio
+
 ```bash
 git clone [https://github.com/TU_USUARIO/Digital-Twin.git](https://github.com/TU_USUARIO/Digital-Twin.git)
 cd Digital-Twin
+
+### 2. Crear y activar el entorno virtual
+
+```bash
+python -m venv .venv
+# En Windows:
+.venv\Scripts\activate
+# En Mac/Linux:
+source .venv/bin/activate
+
+### 3. Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+
+
+### 4. Configurar Credenciales de Google Cloud
+Para que el historial y la subida de datos funcionen, debes tener un proyecto en Google Cloud con BigQuery activado.
+Crea una cuenta de servicio en GCP y descarga la clave en formato JSON.
+Renombra el archivo a gcp_credentials.json y colócalo en la raíz de este proyecto.
+
+
+### 5. Ejecutar la Aplicación
+```bash
+python main.py
