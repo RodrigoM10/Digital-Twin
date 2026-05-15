@@ -1,5 +1,5 @@
 import math as mt
-from core.pid_controller import ControlledUnity
+from models.pid_controller import ControlledUnity
 
 class Tank:
     def __init__(self, diameter=1.0, height=1.0):
@@ -45,19 +45,6 @@ class Tank:
         self.auto_mode = False
         self.valve = 0.0  # Cerramos entrada
         self.current_step = "EMERGENCY SHUTDOWN" 
-    
-    # def display_status(self, target):
-    #     print(f"\n" + "-"*40)
-    #     print(f" TANK DIGITAL TWIN DATA ")
-    #     print(f"-"*40)
-    #     print(f"Inflow (valve E):  {self.inflow_rate:>8.2f} L/s")
-    #     print(f"Outflow (Leak S):  {self.outflow_rate:>8.2f} L/s")
-    #     print(f"Current Volume:    {self.current_volume:>8.2f} L")
-    #     print(f"Max Volume:        {self.max_volume:>8.2f} L")
-    #     print(f"Current Level:     {self.sensor_value:>8.2f} %")
-    #     print(f"Target Level:      {target:>8.2f}  %")
-    #     print(f"Status:            {'STABLE' if abs(target - self.sensor_value) < 5 else 'ADJUSTING'}")
-
 
     def display_status(self, target):
         if self.emergency_stop:

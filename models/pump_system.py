@@ -1,4 +1,4 @@
-from core.pid_controller import ControlledUnity
+from models.pid_controller import ControlledUnity
 
 class Pump:
 

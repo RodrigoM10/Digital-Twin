@@ -1,6 +1,6 @@
 import time
 import threading
-from core.pid_controller import ControlledUnity
+from models.pid_controller import ControlledUnity
 
 class Turbine:
     def __init__(self):
