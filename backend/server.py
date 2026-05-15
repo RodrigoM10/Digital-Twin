@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # Importamos tus modelos 
-from models.pump_system import ControlledPump 
-from models.tank_system import ControlledTank 
-from models.turbine_system import ControlledTurbine 
+from backend.models.pump_system import ControlledPump 
+from backend.models.tank_system import ControlledTank 
+from backend.models.turbine_system import ControlledTurbine 
 
 app = FastAPI(title="Digital Twin API", version="2.0.0")
 
