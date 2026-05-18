@@ -50,6 +50,7 @@ Digital-Twin/
     │   └── App.jsx           # Orquestador principal
     ├── package.json
     └── vite.config.js
+```
 
 ## ⚙️ Instalación y Uso
 
