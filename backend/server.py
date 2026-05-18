@@ -5,19 +5,26 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
 from google.cloud import bigquery
+from google.oauth2 import service_account
 
-# Importamos tus modelos 
+
 from models.pump_system import ControlledPump 
 from models.tank_system import ControlledTank 
 from models.turbine_system import ControlledTurbine 
 
 app = FastAPI(title="Digital Twin API", version="2.0.0")
 
-# --- CONFIGURACIÓN DE GOOGLE CLOUD ---
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "gcp_credentials.json"
-bq_client = bigquery.Client()
-# ACA VA EL NOMBRE DE TU TABLA:
 TABLA_BIGQUERY = "digital_twin_data.telemetry"
+gcp_credentials_env = os.environ.get("GCP_CREDENTIALS_JSON")
+
+if gcp_credentials_env:
+    info = json.loads(gcp_credentials_env)
+    credentials = service_account.Credentials.from_service_account_info(info)
+    bq_client = bigquery.Client(credentials=credentials, project=info['project_id'])
+else:
+    # Si no existe (Local), busca el archivo físico como antes
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "gcp_credentials.json"
+    bq_client = bigquery.Client()
 
 # Configuración de CORS
 app.add_middleware(
