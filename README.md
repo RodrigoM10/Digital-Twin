@@ -1,4 +1,4 @@
-# 🏭 Digital Twin & Cloud SCADA System
+# 🏭 Digital Twin & Cloud HMI System
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![Dash](https://img.shields.io/badge/Dash-Plotly-success.svg)

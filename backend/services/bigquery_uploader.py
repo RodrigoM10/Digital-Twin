@@ -14,8 +14,8 @@ class BigQueryUploader:
         job_config = bigquery.LoadJobConfig(
             source_format=bigquery.SourceFormat.CSV,
             skip_leading_rows=1,
-            autodetect=False, # Ya definimos el esquema arriba
-            write_disposition=bigquery.WriteDisposition.WRITE_APPEND, # Añade datos sin borrar los viejos
+            autodetect=False,
+            write_disposition=bigquery.WriteDisposition.WRITE_APPEND, 
         )
 
         with open(csv_file_path, "rb") as source_file:

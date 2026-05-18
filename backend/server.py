@@ -1,13 +1,23 @@
-from fastapi import FastAPI, HTTPException
+import os
+from typing import Dict, Any
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from datetime import datetime
+from google.cloud import bigquery
 
 # Importamos tus modelos 
-from backend.models.pump_system import ControlledPump 
-from backend.models.tank_system import ControlledTank 
-from backend.models.turbine_system import ControlledTurbine 
+from models.pump_system import ControlledPump 
+from models.tank_system import ControlledTank 
+from models.turbine_system import ControlledTurbine 
 
 app = FastAPI(title="Digital Twin API", version="2.0.0")
+
+# --- CONFIGURACIÓN DE GOOGLE CLOUD ---
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "gcp_credentials.json"
+bq_client = bigquery.Client()
+# ACA VA EL NOMBRE DE TU TABLA:
+TABLA_BIGQUERY = "digital_twin_data.telemetry"
 
 # Configuración de CORS
 app.add_middleware(
@@ -17,27 +27,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Diccionario limpio (sin el 'any' en minúscula que rompía Pydantic)
 sim_context = {
     "model": None,
     "name": "",
     "target": 0.0
 }
 
-# Esquema de datos para recibir del Frontend
-# Solo pedimos el target, el equip_id ya viene en la URL
 class ControlConfig(BaseModel):
     target: float
 
-# Ruta raíz para que no te tire 404 al entrar a localhost:8000
+# --- FUNCIÓN QUE CORRE EN SEGUNDO PLANO ---
+def upload_to_bigquery(equipo: str, valor: float, target: float, valvula: float):
+    """Sube una fila de telemetría a BQ silenciosamente"""
+    try:
+        fila = [{
+            "timestamp": datetime.utcnow().isoformat(),
+            "equipment": equipo,
+            "target": target,
+            "current_value": valor,
+            "valve_pos": valvula
+        }]
+        # Insertamos el dato
+        errores = bq_client.insert_rows_json(TABLA_BIGQUERY, fila)
+        if errores:
+            print(f"❌ Error subiendo a BigQuery: {errores}")
+    except Exception as e:
+        print(f"⚠️ Falla de conexión a la nube: {e}")
+
+
 @app.get("/")
 async def root():
     return {
         "status": "online", 
-        "message": "API corriendo perfecto. Entrá a /docs para ver la interfaz."
+        "message": "API RUN OK."
     }
 
-# Fijate que agregamos 'equip_id: str' como parámetro de la función
 @app.post("/sim/start/{equip_id}")
 async def start_simulation(equip_id: str, config: ControlConfig):
     if equip_id == "1":
@@ -55,21 +79,34 @@ async def start_simulation(equip_id: str, config: ControlConfig):
     sim_context["target"] = config.target
     return {"message": f"Simulación de {sim_context['name']} iniciada", "target": config.target}
 
+# BACKGROUND TASKS
 @app.get("/sim/telemetry")
-async def get_telemetry():
+async def get_telemetry(background_tasks: BackgroundTasks):
     model = sim_context["model"]
     if not model:
         return {"status": "offline"}
 
-    # Ejecutamos el ciclo de control y física
-    model.PID(input_val=model.sensor_value, SetpointAuto=sim_context["target"])
-    model.update(dt=1)
+    # Ejecución ciclo de control y física
+    model.PID(
+        input_val=model.sensor_value, 
+        SetpointAuto=sim_context["target"], 
+        automatic_mode=True, 
+        SetpointMan=0.0
+    )
+    model.update(1)
+
+    equipo = sim_context["name"]
+    valor = round(model.sensor_value, 2)
+    target = sim_context["target"]
+    valvula = round(model.valve, 2)
+
+    background_tasks.add_task(upload_to_bigquery, equipo, valor, target, valvula)
 
     return {
-        "equipment": sim_context["name"],
-        "value": round(model.sensor_value, 2),
-        "target": sim_context["target"],
-        "valve": round(model.valve, 2),
+        "equipment": equipo,
+        "value": valor,
+        "target": target,
+        "valve": valvula,
         "status": {
             "aux_motor": getattr(model, "aux_motor", False),
             "igniters": getattr(model, "igniters", False),

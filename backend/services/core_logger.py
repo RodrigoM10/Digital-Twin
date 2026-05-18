@@ -26,7 +26,6 @@ class DataLogger:
             with open(self.filepath, mode='a', newline='') as file:
                 writer = csv.DictWriter(file, fieldnames=headers)
 
-                # if is a new file
                 if not self.file_exists:
                     writer.writeheader()
                     self.file_exists = True
