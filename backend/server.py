@@ -47,7 +47,6 @@ def upload_to_bigquery(equipo: str, valor: float, target: float, valvula: float)
             "current_value": valor,
             "valve_pos": valvula
         }]
-        # Insertamos el dato
         errores = bq_client.insert_rows_json(TABLA_BIGQUERY, fila)
         if errores:
             print(f"❌ Error subiendo a BigQuery: {errores}")
@@ -69,10 +68,10 @@ async def start_simulation(equip_id: str, config: ControlConfig):
         sim_context["name"] = "Pump (RPM)"
     elif equip_id == "2":
         sim_context["model"] = ControlledTank(diameter=2.0, height=10.0, kP=12.0, kI=0.05, kD=0.1)
-        sim_context["name"] = "Water Tank"
+        sim_context["name"] = "Water Tank (Level %)"
     elif equip_id == "3":
         sim_context["model"] = ControlledTurbine(kP=0.8, kI=0.05, kD=0.1)
-        sim_context["name"] = "Gas Turbine"
+        sim_context["name"] = "Gas Turbine (RPM)"
     else:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     
@@ -113,6 +112,57 @@ async def get_telemetry(background_tasks: BackgroundTasks):
             "burners": getattr(model, "burners_on", False)
         }
     }
+
+@app.get("/sim/analytics/{query_id}")
+async def get_analytics(query_id: str, equip_name: str):
+    # 1. Diccionario de consultas SQL predefinidas
+    queries = {
+        "recent": f"""
+            SELECT timestamp, equipment, target, current_value, valve_pos 
+            FROM `{TABLA_BIGQUERY}` 
+            WHERE equipment = @equip_name 
+            ORDER BY timestamp DESC 
+            LIMIT 50
+        """,
+        "stats": f"""
+            SELECT 
+                equipment, 
+                ROUND(AVG(current_value), 2) as avg_value, 
+                ROUND(MAX(valve_pos), 2) as max_valve_aperture,
+                COUNT(*) as total_records
+            FROM `{TABLA_BIGQUERY}` 
+            WHERE equipment = @equip_name 
+            GROUP BY equipment
+        """,
+        "overspeed": f"""
+            SELECT timestamp, current_value, target, (current_value - target) as deviation
+            FROM `{TABLA_BIGQUERY}` 
+            WHERE equipment = @equip_name AND current_value > (target + 50)
+            ORDER BY timestamp DESC
+            LIMIT 10
+        """
+    }
+
+    # 2. Validación de seguridad
+    if query_id not in queries:
+        raise HTTPException(status_code=400, detail="Consulta no autorizada")
+
+    # 3. Configuración de parámetros seguros
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ScalarQueryParameter("equip_name", "STRING", equip_name)
+        ]
+    )
+    # 4. Ejecución
+    try:
+        query_job = bq_client.query(queries[query_id], job_config=job_config)
+        resultados = [dict(row) for row in query_job]
+        return {"data": resultados}
+    except Exception as e:
+        print(f"Error en BigQuery: {e}")
+        raise HTTPException(status_code=500, detail="Error interno consultando la base de datos")
+
+
 
 @app.get("/sim/history")
 async def get_history(days: int = 7):

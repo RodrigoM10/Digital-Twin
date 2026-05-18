@@ -7,7 +7,7 @@ export default function Header({ isConnected }) {
       <div>
         <h1 className="text-3xl font-bold text-teal-400 tracking-tight flex items-center gap-3">
           <Activity className="w-8 h-8" />
-          Digital Twin SCADA
+          Digital Twin - HMI
         </h1>
         <p className="text-slate-400 mt-1 text-sm">Monitor de Equipamiento Industrial | React + FastAPI + BigQuery</p>
       </div>
