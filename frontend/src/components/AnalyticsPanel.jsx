@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Database, Loader2 } from 'lucide-react';
-
+import { Database, Loader2, Download } from 'lucide-react';
 import AnalyticsControls from './AnalyticsControls';
 import AnalyticsChart from './AnalyticsChart';
 import AnalyticsTable from './AnalyticsTable';
 
-const API_URL = 'http://127.0.0.1:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 export default function AnalyticsPanel() {
   const [equipName, setEquipName] = useState('Pump (RPM)');
@@ -31,6 +30,21 @@ export default function AnalyticsPanel() {
     setLoading(false);
   };
 
+  const downloadCSV = () => {
+    if (results.length === 0) return;
+    const headers = Object.keys(results[0]).join(',');
+    const rows = results.map(row => Object.values(row).join(',')).join('\n');
+    const csv = `${headers}\n${rows}`;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `scada_export_${activeQueryType}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 shadow-xl min-h-[500px] flex flex-col">
       
@@ -51,10 +65,17 @@ export default function AnalyticsPanel() {
         </div>
       ) : results.length > 0 ? (
         <div className="flex flex-col gap-6 flex-grow">
-          {/* Componente 2: Gráfico Dinámico */}
+          {/* Botón de Exportar */}
+          <div className="flex justify-end">
+            <button 
+              onClick={downloadCSV}
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+            >
+              <Download className="w-4 h-4" /> Exportar a CSV
+            </button>
+          </div>
+
           <AnalyticsChart results={results} activeQueryType={activeQueryType} />
-          
-          {/* Componente 3: Tabla Paginada */}
           <AnalyticsTable results={results} />
         </div>
       ) : (
