@@ -15,7 +15,7 @@ Este proyecto es una implementación completa **End-to-End** de un Gemelo Digita
 ---
 
 ## 📸 Demostración en vercel: 
-https://vercel.com/rodrigom10s-projects/digital-twin
+https://digital-twin-wine.vercel.app/
 
 ---
 
