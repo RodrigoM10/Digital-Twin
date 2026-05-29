@@ -14,10 +14,8 @@ Este proyecto es una implementación completa **End-to-End** de un Gemelo Digita
 
 ---
 
-## 📸 Demostración
-*(Agrega aquí tus nuevas capturas de pantalla o un GIF del frontend en React y la pestaña de Analytics)*
-<img src="assets/dashboard_live.jpg" alt="Dashboard en Vivo" width="400" />
-<img src="assets/analytics_panel.jpg" alt="Panel de Analytics" width="400" />
+## 📸 Demostración en vercel: 
+https://vercel.com/rodrigom10s-projects/digital-twin
 
 ---
 
