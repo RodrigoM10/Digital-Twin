@@ -55,7 +55,6 @@ Digital-Twin/
 ### 1. Clonar el repositorio
 
 ```bash
-<<<<<<< HEAD
 git clone [https://github.com/TU_USUARIO/Digital-Twin.git](https://github.com/TU_USUARIO/Digital-Twin.git)
 cd Digital-Twin
 ```
